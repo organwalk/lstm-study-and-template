@@ -23,7 +23,8 @@ n_features = 1
 X = X.reshape((X.shape[0], X.shape[1], n_features))
 
 model = Sequential()
-model.add(LSTM(50, activation='relu', input_shape=(n_steps, n_features)))
+model.add(LSTM(50, activation='relu', return_sequences=True, input_shape=(n_steps, n_features)))
+model.add(LSTM(50, activation='relu'))
 model.add(Dense(1))
 model.compile(optimizer='adam', loss='mse')
 

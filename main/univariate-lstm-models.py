@@ -1,9 +1,5 @@
 from numpy import array
-# 单变量LSTM模型
 
-
-# 1.将单变量序列分解为多个样本
-# 2.基于每个样本的时间步长（此处为3），在结尾出输出单个时间步长预测值
 def split_sequence(sequence, n_steps):
     x, y = list(), list()
     for i in range(len(sequence)):

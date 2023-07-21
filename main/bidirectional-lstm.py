@@ -2,6 +2,7 @@ from numpy import array
 from keras.models import Sequential
 from keras.layers import LSTM
 from keras.layers import Dense
+from keras.layers import Bidirectional
 
 
 def split_sequence(sequence, n_steps):
@@ -23,11 +24,11 @@ n_features = 1
 X = X.reshape((X.shape[0], X.shape[1], n_features))
 
 model = Sequential()
-model.add(LSTM(50, activation='relu', input_shape=(n_steps, n_features)))
+model.add(Bidirectional(LSTM(50, activation='relu'), input_shape=(n_steps, n_features)))
 model.add(Dense(1))
 model.compile(optimizer='adam', loss='mse')
 
-model.fit(X, y, epochs=200, verbose=0)
+model.fit(X, y, epochs=500, verbose=0)
 
 x_input = array([70, 80, 90])
 x_input = x_input.reshape((1, n_steps, n_features))
