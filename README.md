@@ -1525,4 +1525,4 @@ print(yhat)
 
 [深入浅出LSTM及其Python代码实现 ](https://www.zhihu.com/tardis/zm/art/104475016?source_id=1005)
 
-[多变量时间序列的多步预测——LSTM模型](https://zhuanlan.zhihu.com/p/191211602#:~:text= 长短时记忆网络（Long Short Term,Memory，简称LSTM）模型，本质上是一种特定形式的循环神经网络（Recurrent Neural Network，简称RNN)
+[多变量时间序列的多步预测——LSTM模型](https://zhuanlan.zhihu.com/p/191211602#:~:text=)
