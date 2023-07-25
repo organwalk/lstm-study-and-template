@@ -34,6 +34,8 @@ dataset = hstack((in_seq1, in_seq2, out_seq))
 n_steps_in, n_steps_out = 3, 2
 
 X, y = split_sequences(dataset, n_steps_in, n_steps_out)
+print(X)
+print(y)
 
 n_features = X.shape[2]
 
