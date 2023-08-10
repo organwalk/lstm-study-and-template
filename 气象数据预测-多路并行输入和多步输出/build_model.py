@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 '''
 
 
-def training_short_term_model_about_oneday(x, y, n_steps_in, n_steps_out, n_features):
+def training_short_term_model(x, y, n_steps_in, n_steps_out, n_features):
     model = Sequential()
     # this code will in used by this api " kernel_regularizer=regularizers.l2(0.01) "
     model.add(LSTM(500, activation='relu', input_shape=(n_steps_in, n_features)))
@@ -33,7 +33,7 @@ def training_short_term_model_about_oneday(x, y, n_steps_in, n_steps_out, n_feat
 
     model.compile(optimizer='adam', loss='mse')
 
-    early_stopping = EarlyStopping(monitor='val_loss', patience=20, mode='min')
+    early_stopping = EarlyStopping(monitor='val_loss', patience=10, mode='min')
     history = model.fit(x, y, epochs=300, verbose=1, validation_split=0.2, callbacks=[early_stopping])
 
     plt.plot(history.history['loss'])
