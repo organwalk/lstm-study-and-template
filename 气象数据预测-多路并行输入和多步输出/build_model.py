@@ -7,6 +7,8 @@ from keras.layers import Dropout
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras import regularizers
 import matplotlib.pyplot as plt
+from evaluation_model import get_chart_about_training_loss
+import numpy as np
 
 
 '''
@@ -24,9 +26,8 @@ import matplotlib.pyplot as plt
 
 def training_short_term_model(x, y, n_steps_in, n_steps_out, n_features):
     model = Sequential()
-    # this code will in used by this api " kernel_regularizer=regularizers.l2(0.01) "
+
     model.add(LSTM(500, activation='relu', input_shape=(n_steps_in, n_features)))
-    # model.add(Dropout(0.5))  # 添加Dropout层
     model.add(RepeatVector(n_steps_out))
     model.add(LSTM(500, activation='relu', return_sequences=True))
     model.add(TimeDistributed(Dense(n_features)))
@@ -36,15 +37,37 @@ def training_short_term_model(x, y, n_steps_in, n_steps_out, n_features):
     early_stopping = EarlyStopping(monitor='val_loss', patience=10, mode='min')
     history = model.fit(x, y, epochs=300, verbose=1, validation_split=0.2, callbacks=[early_stopping])
 
-    plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
-    plt.title('Model Loss')
-    plt.ylabel('Loss')
-    plt.xlabel('Epoch')
-    plt.legend(['Train', 'Validation'], loc='upper right')
-    plt.show()
+    get_chart_about_training_loss(history)
 
-    print("Input shape:", x.shape)
-    print("Output shape:", y.shape)
+    return model
+
+
+def training_long_term_with_in_a_week_model(x, y, n_steps_in, n_steps_out, n_features):
+    model = Sequential()
+
+    model.add(LSTM(500, activation='relu', input_shape=(n_steps_in, n_features)))
+    model.add(RepeatVector(n_steps_out))
+    model.add(LSTM(500, activation='relu', return_sequences=True))
+    model.add(TimeDistributed(Dense(n_features)))
+
+    model.compile(optimizer='adam', loss='mse')
+
+    early_stopping = EarlyStopping(monitor='val_loss', patience=10, mode='min')
+    history = model.fit(x, y, epochs=10, verbose=1)
+
+    # get_chart_about_training_loss(history)
+
+    # 逐步预测
+    predictions = []
+    current_input = x[0]  # 使用第一个输入数据开始预测
+
+    for _ in range(n_steps_out):
+        # 预测一个时间步
+        predicted_step = model.predict(np.array([current_input]))[0]
+        print(predicted_step)
+        predictions.append(predicted_step)
+
+        # 更新当前输入序列，将刚刚预测的结果加入到输入序列中
+        current_input = np.concatenate((current_input[1:], predicted_step[-1:]), axis=0)
 
     return model

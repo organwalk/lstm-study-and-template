@@ -17,6 +17,16 @@ def test_view_about_model(y, yhat):
     plt.show()
 
 
+def get_chart_about_training_loss(history):
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('Model Loss')
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Validation'], loc='upper right')
+    plt.show()
+
+
 def evaluate(real, predict):
     mse = mean_squared_error(real[0], predict[0])
     r_mse = mean_squared_error(real[0], predict[0], squared=False)
@@ -31,4 +41,3 @@ def evaluate(real, predict):
     plt.xlabel('Metrics')
     plt.ylabel('Values')
     plt.show()
-
