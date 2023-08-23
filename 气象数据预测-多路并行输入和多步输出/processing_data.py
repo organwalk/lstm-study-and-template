@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import numpy as np
+from datetime import datetime, timedelta
 from sklearn.preprocessing import MinMaxScaler
 
 
@@ -46,39 +47,32 @@ def split_long_term_sequences(sequences, n_steps_in, n_steps_out):
         data.append(processed_data)
     x, y = [], []
     for i in range(len(data)):
-        # 划分输入序列
         end_ix = i + n_steps_in
-        # 划分输出序列
         out_end_ix = end_ix + n_steps_out
-        # 确保划分的结束索引不超过数据范围
         if out_end_ix <= len(data):
-            # 提取输入和输出序列
             seq_x = data[i:end_ix]
             seq_y = data[end_ix:out_end_ix]
-
             x.append(seq_x)
             y.append(seq_y)
-    print(np.array(x))
-    print(np.array(y))
     return np.array(x), np.array(y)
 
 
 # 短期模型数据预处理
-def short_term_pre_process():
-    files_data = [os.path.join("data", f) for f in os.listdir("data") if f.endswith(".csv")]
-    x, y, scaler = split_short_term_sequences(files_data)
-    return x, y, scaler
+def short_term_pre_process(file_config):
+    existing_file, missing_dates = get_files(file_config)
+    x, y, scaler = split_short_term_sequences(existing_file)
+    return x, y, scaler, existing_file, missing_dates
 
 
 # 七天内长期模型数据预处理
-def long_term_with_in_a_week_pre_process(n_steps_in, n_steps_out):
-    files_data = [os.path.join("data", f) for f in os.listdir("data") if f.endswith(".csv")]
-    x, y = split_long_term_sequences(files_data, n_steps_in, n_steps_out)
-    return x, y
+def long_term_with_in_a_week_pre_process(n_steps_in, n_steps_out, file_config):
+    existing_files, missing_dates = get_files(file_config)
+    x, y = split_long_term_sequences(existing_files, n_steps_in, n_steps_out)
+    return x, y, existing_files, missing_dates
 
 
 # 预测时处理输入、输出序列的数据
-def process_sequence_data(file, seq_type, date_type, file_date=None):
+def sequence(file, seq_type, date_type, file_date=None):
     df_data = pd.read_csv(file)
     if seq_type == 'input':
         if file_date is not None:
@@ -98,3 +92,25 @@ def calculate_df_data_avg(df_data, date_type, custom_time=None):
     df_hourly = df.resample(date_type).mean().round(2).reset_index().drop('Time', axis=1)
     result = df_hourly.to_numpy().astype(int)
     return result
+
+
+def get_files(file_config):
+    station = file_config['station']
+    start_date = datetime.strptime(file_config['start_date'], "%Y-%m-%d")
+    end_date = datetime.strptime(file_config['end_date'], "%Y-%m-%d")
+    existing_files = []
+    missing_dates = []
+    current_date = start_date
+    while current_date <= end_date:
+        # 构建文件名
+        file_name = f"{station}_data_{current_date.strftime('%Y-%m-%d')}.csv"
+        file_path = os.path.join("data", file_name)
+
+        if os.path.exists(file_path):
+            existing_files.append(file_path)
+        else:
+            missing_dates.append(current_date.strftime('%Y-%m-%d'))
+
+        current_date += timedelta(days=1)
+
+    return existing_files, missing_dates
