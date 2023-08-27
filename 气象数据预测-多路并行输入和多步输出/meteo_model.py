@@ -8,6 +8,7 @@ def start_predict(json):
     result = None
     if model_type == 'ShortTermByLSTM':
         x, y, scaler, existing_file, missing_dates = processing_data.short_term_pre_process(json)
+        print(existing_file)
         result = loading_model.short_term_model(
             get_config(model_type, x, y, False, existing_file, missing_dates, scaler)
         )

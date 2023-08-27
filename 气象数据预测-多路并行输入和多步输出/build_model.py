@@ -15,11 +15,13 @@ def short_term(x, y, n_steps_in, n_steps_out, n_features):
     model.add(TimeDistributed(Dense(n_features)))
 
     model.compile(optimizer='adam', loss='mse')
+    model.fit(x, y, epochs=300, verbose=1)
 
-    early_stopping = EarlyStopping(monitor='val_loss', patience=10, mode='min')
-    history = model.fit(x, y, epochs=300, verbose=1, validation_split=0.2, callbacks=[early_stopping])
-
-    loss(history)
+    # early_stopping = EarlyStopping(monitor='val_loss', patience=10, mode='min')
+    # history = model.fit(x, y, epochs=300, verbose=1, validation_split=0.2, callbacks=[early_stopping])
+    #
+    # loss(history)
+    model.save('short_term.h5')
 
     return model
 

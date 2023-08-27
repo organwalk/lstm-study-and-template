@@ -89,7 +89,7 @@ def calculate_df_data_avg(df_data, date_type, custom_time=None):
     else:
         df_data['Time'] = pd.to_datetime(df_data['Time'])
     df = df_data.set_index('Time')
-    df_hourly = df.resample(date_type).mean().round(2).reset_index().drop('Time', axis=1)
+    df_hourly = df.resample('H').mean().round(2).reset_index().drop('Time', axis=1)
     result = df_hourly.to_numpy().astype(int)
     return result
 

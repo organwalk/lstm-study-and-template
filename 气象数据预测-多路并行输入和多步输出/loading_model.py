@@ -2,6 +2,7 @@ import numpy as np
 import build_model
 import processing_data
 import evaluation_model
+from tensorflow.keras.models import load_model
 
 
 def short_term_model(config):
@@ -20,10 +21,18 @@ def short_term_model(config):
     else:
         status = True
         msg = f"以下日期未能获取到有效数据文件：{config['missing_dates']}，模型将对此采用【向前填充】处理，预测结果可能受此影响"
-    model = build_model.short_term(
-        config['x'], config['y'], config['steps_in'], config['steps_out'], config['features']
-    )
-    x_input, _ = processing_data.sequence(f"{config['existing_files']}", 'input', config['date_type'])
+    # model = build_model.short_term(
+    #     config['x'], config['y'], config['steps_in'], config['steps_out'], config['features']
+    # )
+    model = load_model('short_term.h5')
+    result_list = []
+    scaler = ''
+    for file_path in config['existing_file']:
+        x_input, scaler = processing_data.sequence(file_path, 'input', config['date_type'])
+        result_list.append(x_input)
+    x_input = np.array(result_list)
+    print(x_input)
+    config['scaler'] = scaler
     prediction_list = predict(x_input, config, model)
 
     return {
@@ -52,6 +61,7 @@ def long_term_with_in_a_week_model(config):
     model = build_model.long_term_with_in_a_week(
         config['x'], config['y'], config['steps_in'], config['steps_out'], config['features']
     )
+
     # file_array = config['existing_files']
     file_array = ['data\\1_data_2023-06-27.csv', 'data\\1_data_2023-06-28.csv']
     result_list = []
@@ -69,6 +79,7 @@ def long_term_with_in_a_week_model(config):
 
 
 def predict(x_input, config, model):
+    print(x_input)
     x_input = x_input.reshape((1, config['steps_in'], config['features']))
 
     yhat = model.predict(x_input, verbose=1)

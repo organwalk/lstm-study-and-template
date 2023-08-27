@@ -1,11 +1,13 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from meteo_model import start_predict
 import result
 app = Flask(__name__)
+CORS(app)
 
 
-@app.route('/qx/predict', methods=['POST'])
-def endpoint_a():
+@app.route('/qx/model/predict', methods=['POST'])
+def http_model_predict():
     required_fields = ['station', 'start_date', 'end_date', 'model_type']
     validation_error = result.validate_fields(request.get_json(), required_fields)
     if validation_error:
@@ -21,16 +23,23 @@ def endpoint_a():
         return jsonify(result.error(500, "内部服务错误"))
 
 
+@app.route('/qx/model/info', methods=['GET'])
+def http_model_info():
+    data = {
+        'version': '#22803202902C',
+        'cn_des': '信创技术下气象数据预测模型',
+        'technology': '基于TensorFlow、StatsModels和Prophet构建预测模型',
+        'support': 'LSTM、ARIMA、Prophet',
+        'update': '2023-08-25'
+    }
+    return jsonify(result.success('获取成功', data))
 
-@app.route('/b')
-def endpoint_b():
-    data = {'data': 'This is endpoint B'}
-    return jsonify(data)
 
-
-@app.route('/c')
-def endpoint_c():
-    data = {'data': 'This is endpoint C'}
+@app.route('/qx/model/list')
+def http_model_list():
+    data = {
+        'modelList': ['LSTM', 'ARIMA', 'Prophet', 'Mixed Models']
+    }
     return jsonify(data)
 
 
@@ -50,4 +59,4 @@ def server_error(e):
 
 
 if __name__ == '__main__':
-    app.run(port=9594)
+    app.run(host='0.0.0.0', port=9594)
