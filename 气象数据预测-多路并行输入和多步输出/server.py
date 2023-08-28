@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from meteo_model import start_predict
 import result
+import numpy as np
+import pandas as pd
 app = Flask(__name__)
 CORS(app)
 
@@ -41,6 +43,36 @@ def http_model_list():
         'modelList': ['LSTM', 'ARIMA', 'Prophet', 'Mixed Models']
     }
     return jsonify(data)
+
+
+@app.route('/qx/correlation', methods=['POST'])
+def http_model_correlation():
+    required_fields = ['station', 'start_date', 'end_date', 'correlation']
+    missing_fields = []
+    for field in required_fields:
+        if field not in request.args:
+            missing_fields.append(field)
+    if missing_fields:
+        if len(missing_fields) > 1:
+            message = f"以下字段不能为空: {', '.join(missing_fields)}"
+        else:
+            message = f"字段 '{missing_fields[0]}' 不能为空"
+        return jsonify({'error': message}), 400
+    else:
+        data = pd.read_csv('data//1_data_2023-06-27.csv')
+
+        columns = ['Temperature', 'Humidity', 'Speed', 'Direction', 'Rain', 'Sunlight', 'PM2.5', 'PM10']
+        data_subset = data[columns]
+
+        data_array = data_subset.to_numpy()
+
+        correlation_matrix = np.corrcoef(data_array, rowvar=False)
+        correlation_matrix[np.isnan(correlation_matrix)] = 0
+        result_array = correlation_matrix.tolist()
+        print(result_array)
+
+        # 执行你的相关操作
+        return jsonify({'data': '200'})
 
 
 @app.errorhandler(405)
