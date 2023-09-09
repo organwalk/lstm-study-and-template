@@ -37,7 +37,7 @@ def http_model_info():
     return jsonify(result.success('获取成功', data))
 
 
-@app.route('/qx/model/list')
+@app.route('/qx/model/list', methods=['GET'])
 def http_model_list():
     data = {
         'modelList': ['LSTM', 'ARIMA', 'Prophet', 'Mixed Models']
@@ -68,7 +68,7 @@ def http_model_correlation():
 
         correlation_matrix = np.corrcoef(data_array, rowvar=False)
         correlation_matrix[np.isnan(correlation_matrix)] = 0
-        result_array = correlation_matrix.tolist()
+        result_array = np.around(correlation_matrix, decimals=2).tolist()
         print(result_array)
 
         # 执行你的相关操作
