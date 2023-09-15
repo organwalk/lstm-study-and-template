@@ -30,11 +30,11 @@ def json_user_req_validate(api, user_req_json, server_req_fields):
 
     missing_check = __json_missing_validate(user_req_json, server_req_fields)
     if missing_check:
-        return '调用方传递JSON格式数据存在空缺值，提示消息如下：' + missing_check
+        return f'调用方传递JSON格式数据存在空缺值，提示消息如下：{missing_check}'
 
     error_msg = __json_value_validate(user_req_json, api)
     if error_msg is not None:
-        return '调用方传递JSON格式数据存在错误，提示消息如下：' + error_msg
+        return f'调用方传递JSON格式数据存在错误，提示消息如下：{error_msg}'
 
     return None
 
@@ -128,7 +128,7 @@ def __start_end_date_error(station, date):
         if repository.station_valid_date(station, date) > 0:
             return date
         else:
-            return __error_msg("值为" + date + "的date相关字段，其日期下不存在有效数据，请重新指定")
+            return __error_msg(f"值为{date}的date相关字段，其日期下不存在有效数据，请重新指定")
     else:
         return __error_msg("date相关字段需要YYYY-MM-DD格式字符串")
 

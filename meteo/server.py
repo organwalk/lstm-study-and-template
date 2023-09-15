@@ -77,6 +77,7 @@ def http_model_correlation():
 
 @app.errorhandler(405)
 def handle_method_not_allowed(e):
+
     url_rule = next(
         (rule for rule in app.url_map.iter_rules() if 'qx/predict' in rule.rule),
         None

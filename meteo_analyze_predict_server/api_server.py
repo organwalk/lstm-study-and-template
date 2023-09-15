@@ -53,6 +53,11 @@ def __server_api_notfound(e):
     return result.not_found('该接口不存在，请修改后重试')
 
 
+@app.errorhandler(405)
+def handle_method_not_allowed(e):
+    return result.fail_method(f"该接口仅支持 {', '.join([method for method in e.valid_methods if (method != 'OPTIONS')])} 方法")
+
+
 @app.errorhandler(500)
 def __server_error(e):
     return result.error('内部服务处理错误')

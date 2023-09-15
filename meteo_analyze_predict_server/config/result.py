@@ -4,6 +4,7 @@
     未找到：404
     错误：500
     未通过字段检查：422
+    请求方法错误: 405
     by organwalk 2023-08-15
 """
 from collections import OrderedDict
@@ -53,6 +54,18 @@ def fail_entity(msg):
         json.dumps(
             OrderedDict([
                 ('code', 422),
+                ('msg', msg)
+            ])
+        ),
+        mimetype='application/json'
+    )
+
+
+def fail_method(msg):
+    return Response(
+        json.dumps(
+            OrderedDict([
+                ('code', 405),
                 ('msg', msg)
             ])
         ),
