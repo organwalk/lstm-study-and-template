@@ -30,7 +30,7 @@ def __api_model_info():
     return result.success('成功获取模型信息', info_data) if info_data else result.not_found('未能获取模型信息')
 
 
-@app.route('/anapredict/correlation', methods=['POST'])
+@app.route('/anapredict/analyze/correlation', methods=['POST'])
 def __api_data_correlation():
     """
     对给定的要求进行气象数据分析
@@ -40,13 +40,24 @@ def __api_data_correlation():
 
     by organwalk 2023-08-15
     """
-    validate = req_utils.validate_json_user_req('/anapredict/correlation',
+    validate = req_utils.validate_json_user_req('/anapredict/analyze/correlation',
                                                 request.get_json(),
                                                 server_req.CORRELATION)
     if validate is None:
         correlation_list = analyze_service.get_correlation_list(**request.get_json())
         return result.success('已成功计算出协相关矩阵结果', correlation_list) if correlation_list is not None \
             else result.error('计算过程中发生了错误，请稍后再试')
+    else:
+        return result.fail_entity(validate)
+
+
+@app.route('/anapredict/model/prediction', methods=['POST'])
+def __api_model_prediction():
+    validate = req_utils.validate_json_user_req('/anapredict/model/prediction',
+                                                request.get_json(),
+                                                server_req.PREDICTION)
+    if validate is None:
+        return result.success('成功', request.get_json())
     else:
         return result.fail_entity(validate)
 

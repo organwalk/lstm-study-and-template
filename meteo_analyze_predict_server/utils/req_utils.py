@@ -63,15 +63,17 @@ def __validate_json_value(user_req_json: dict, api: str):
 
     by organwalk 2023-08-15
     """
-    if api == '/anapredict/correlation':
+    if api == '/anapredict/analyze/correlation':
         return __validate_api_correlation(user_req_json)
+    if api == '/anapredict/model/prediction':
+        return __validate_api_prediction(user_req_json)
     else:
         return None
 
 
 def __validate_api_correlation(user_req_json: dict):
     """
-    校验/anapredict/correlation接口的JSON数据
+    校验/anapredict/analyze/correlation接口的JSON数据
 
     :param:
         user_req_json: 调用方传递的JSON数据:
@@ -85,11 +87,46 @@ def __validate_api_correlation(user_req_json: dict):
     by organwalk 2023-08-15
     """
     error_msg_list = [fields_utils.validate_station(user_req_json['station']),
-                      fields_utils.validate_start_end_date(user_req_json['station'], user_req_json['start_date']),
-                      fields_utils.validate_start_end_date(user_req_json['station'], user_req_json['end_date']),
+                      fields_utils.validate_date(user_req_json['station'], user_req_json['start_date']),
+                      fields_utils.validate_date(user_req_json['station'], user_req_json['end_date']),
                       fields_utils.validate_which_or_correlation(user_req_json['correlation'])]
     msg_list = [msg['msg'] for msg in error_msg_list if isinstance(msg, dict)]
     return '；'.join(set(msg_list)) if msg_list else None
 
 
+def __validate_api_prediction(user_req_json: dict):
+    """
+    校验/anapredict/model/prediction接口的JSON数据
 
+    :param:
+        user_req_json: 调用方传递的JSON数据:
+            station: (str) 气象站编号
+            start_date: (str) 起始日期
+            end_date: (str) 结束日期
+            model_type: (str) 模型类型
+    :return:
+        str or None: 错误消息，如果校验通过则返回None
+
+    by organwalk 2023-08-15
+    """
+    error_msg_list = [fields_utils.validate_station(user_req_json['station']),
+                      fields_utils.validate_date(user_req_json['station'], user_req_json['start_date']),
+                      fields_utils.validate_date(user_req_json['station'], user_req_json['end_date']),
+                      fields_utils.validate_model_type(user_req_json['model_type'])]
+    msg_list = [msg['msg'] for msg in error_msg_list if isinstance(msg, dict)]
+    # error_msg_list的子元素错误消息为字典形式，若为str类型，则表示没有错误消息
+    if all(isinstance(item, str) for item in error_msg_list):
+        model_type = str(user_req_json['model_type'])
+        start_date = str(user_req_json['start_date'])
+        end_date = str(user_req_json['end_date'])
+        # 0.检查24小时预测时模型选取是否正确
+        if start_date == end_date and model_type.split('_')[0] != 'SHORTTERM':
+            msg_list.append('当start_date与end_date相等时表示未来24小时预测，model_type应为SHORTTERM前缀的模型')
+        elif start_date != end_date:
+            # 1.检查未来七日预测时间是否小于五天（未达到前向填充标准）
+            if not fields_utils.validate_five_day_date_range(start_date, end_date):
+                msg_list.append('当start_date与end_date不相等时表示未来七日预测，日期相关字段应该保证五日以上的有效时间')
+            # 2.检查未来七日预测时模型选取是否正确
+            elif model_type.split('_')[0] != 'LONGTERM':
+                msg_list.append('当start_date与end_date不相等时表示未来七日预测，model_type应为LONGTERM前缀的模型')
+    return '；'.join(set(msg_list)) if msg_list else None

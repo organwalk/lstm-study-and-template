@@ -21,7 +21,7 @@ def short_term(x, y, n_steps_in, n_steps_out, n_features):
     # history = model.fit(x, y, epochs=300, verbose=1, validation_split=0.2, callbacks=[early_stopping])
     #
     # loss(history)
-    model.save('short_term.h5')
+    model.save('lstm.h5')
 
     return model
 

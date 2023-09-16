@@ -6,6 +6,14 @@ import pandas as pd
 
 
 def get_model_info():
+    """
+    获取模型信息
+
+    :return:
+        OrderedDict or list: 返回封装为OrderedDict的结果，当结果为空时，返回空列表
+
+    by organwalk 2023-08-15
+    """
     mysql = get_mysql_obj()
     mysql.execute(mysql_statements.NEW_MODEL_INFO)
     result = mysql.fetchall()[0][1:7]
@@ -13,6 +21,16 @@ def get_model_info():
 
 
 def validate_station_date(station: str, date: str):
+    """
+    校验指定气象站下的日期是否存在记录
+
+    :param station: 气象站编号
+    :param date: 需要校验的日期
+    :return:
+        int: 记录数
+
+    by organwalk 2023-08-15
+    """
     mysql = get_mysql_obj()
     mysql.execute(mysql_statements.VALID_DATE, (station, date))
     return int(mysql.fetchall()[0][0])

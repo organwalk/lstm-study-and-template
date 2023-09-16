@@ -61,7 +61,7 @@ def __send_heartbeat_periodically(client):
 
     :param client: nacos服务中心
     :return:
-        无返回值，每十秒发送一次心跳至nacos
+        None: 每十秒发送一次心跳至nacos
 
     by organwalk 2023-08-15
     """

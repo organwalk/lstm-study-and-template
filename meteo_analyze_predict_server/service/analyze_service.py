@@ -8,7 +8,7 @@ from meteo_analyze_predict_server.repository import repository
 
 def get_correlation_list(station: str, start_date: str, end_date: str, correlation: str):
     """
-    获取计算后的相关系数矩阵
+    获取计算后的协相关矩阵
 
     :param station: 气象站编号
     :param start_date: 起始日期
@@ -23,6 +23,3 @@ def get_correlation_list(station: str, start_date: str, end_date: str, correlati
     if merged_data is None:
         return None
     return meteo_data_analyze.calculate_correlation_matrix(correlation, merged_data)
-
-
-get_correlation_list('1', '2023-06-29', '2023-06-30', '1,2,3,4,5,6,7,8')

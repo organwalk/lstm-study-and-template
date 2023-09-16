@@ -24,7 +24,7 @@ def short_term_model(config):
     # model = build_model.short_term(
     #     config['x'], config['y'], config['steps_in'], config['steps_out'], config['features']
     # )
-    model = load_model('short_term.h5')
+    model = load_model('../model/short_term/lstm.h5')
     result_list = []
     scaler = ''
     for file_path in config['existing_file']:
