@@ -1,5 +1,5 @@
 """
-    其它服务的配置信息
+    定义配置信息
     by organwalk 2023-08-15
 """
 import pymysql
@@ -9,6 +9,8 @@ import threading
 import time
 
 
+FILE_PATH = "C:/Users/haruki/PycharmProjects/lstm/data/"
+
 __MYSQL_CONFIG = {
     'host': 'localhost',
     'user': 'root',
@@ -17,7 +19,7 @@ __MYSQL_CONFIG = {
 }
 
 
-def mysql_obj():
+def get_mysql_obj():
     """
     返回MySQL的游标对象
 
@@ -43,17 +45,17 @@ def register_to_nacos():
     注册服务至nacos
 
     :return:
-        无返回值，开启一个新的线程向nacos发送心跳包
+        None: 开启一个新的线程向nacos发送心跳包
 
     by organwalk 2023-08-15
     """
     client = NacosClient('localhost:8848')
     client.add_naming_instance(**__NACOS_CONFIG)
-    heartbeat_thread = threading.Thread(target=send_heartbeat_periodically, args=(client,), daemon=True)
+    heartbeat_thread = threading.Thread(target=__send_heartbeat_periodically, args=(client,), daemon=True)
     heartbeat_thread.start()
 
 
-def send_heartbeat_periodically(client):
+def __send_heartbeat_periodically(client):
     """
     每十秒发送一次心跳至nacos
 
@@ -67,6 +69,3 @@ def send_heartbeat_periodically(client):
     while True:
         first_run = False if first_run else time.sleep(10)
         client.send_heartbeat(**__NACOS_CONFIG)
-
-
-

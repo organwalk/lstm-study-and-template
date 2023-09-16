@@ -1,22 +1,23 @@
 """
     定义响应处理
-    成功：200
-    未找到：404
-    错误：500
-    未通过字段检查：422
-    请求方法错误: 405
     by organwalk 2023-08-15
 """
 from collections import OrderedDict
 from flask import Response
 import json
 
+__SUCCESS_CODE = 200
+__NOT_FOUND_CODE = 404
+__ERROR_CODE = 500
+__FAIL_ENTITY_CODE = 422
+__FAIL_METHOD_CODE = 405
+
 
 def success(msg, data):
     return Response(
         json.dumps(
             OrderedDict([
-                ('code', 200),
+                ('code', __SUCCESS_CODE),
                 ('msg', msg),
                 ('data', data)
             ])
@@ -29,7 +30,7 @@ def not_found(msg):
     return Response(
         json.dumps(
             OrderedDict([
-                ('code', 404),
+                ('code', __NOT_FOUND_CODE),
                 ('msg', msg)
             ])
         ),
@@ -41,7 +42,7 @@ def error(msg):
     return Response(
         json.dumps(
             OrderedDict([
-                ('code', 500),
+                ('code', __ERROR_CODE),
                 ('msg', msg)
             ])
         ),
@@ -53,7 +54,7 @@ def fail_entity(msg):
     return Response(
         json.dumps(
             OrderedDict([
-                ('code', 422),
+                ('code', __FAIL_ENTITY_CODE),
                 ('msg', msg)
             ])
         ),
@@ -65,7 +66,7 @@ def fail_method(msg):
     return Response(
         json.dumps(
             OrderedDict([
-                ('code', 405),
+                ('code', __FAIL_METHOD_CODE),
                 ('msg', msg)
             ])
         ),
